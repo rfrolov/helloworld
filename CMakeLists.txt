@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(helloworld VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+if (DEFINED ENV{TRAVIS_BUILD_NUMBER})
+    project(helloworld VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+else()
+    project(helloworld VERSION 0.0.1)
+endif()
 
-add_subdirectory(googletest)
+add_subdirectory(googletest EXCLUDE_FROM_ALL)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 enable_testing()
 
@@ -23,12 +27,6 @@ set_target_properties(
 
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib)
 
-target_link_libraries(
-        test_${PROJECT_NAME}
-        ${Boost_LIBRARIES}
-        ${PROJECT_NAME}_lib
-)
-
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
@@ -43,6 +41,7 @@ include(CPack)
 
 target_link_libraries(
         test_${PROJECT_NAME}
+        ${PROJECT_NAME}_lib
         gtest
         pthread
 )
